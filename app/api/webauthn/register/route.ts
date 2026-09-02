@@ -25,4 +25,23 @@ export async function POST(req: Request) {
   globalThis.__challenge = options.challenge
 
   return NextResponse.json({ options })
+}import { NextResponse } from 'next/server'
+import { generateRegistrationOptions } from '@simplewebauthn/server'
+
+export async function POST(req: Request) {
+  const { userId, email, name } = await req.json()
+  const options = await generateRegistrationOptions({
+    rpName: 'CleanFlow',
+    rpID: process.env.WEBAUTHN_RP_ID || 'localhost',
+    userName: email,
+    userDisplayName: name || email,
+    timeout: 60000,
+    attestationType: 'none',
+    authenticatorSelection: {
+      residentKey: 'preferred',
+      userVerification: 'required',
+    },
+  })
+  globalThis.__challenge = options.challenge
+  return NextResponse.json({ options })
 }

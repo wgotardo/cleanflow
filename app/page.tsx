@@ -25,7 +25,6 @@ export default function LoginPage() {
     setLoading(true)
 
     if (isSignUp) {
-      // CADASTRO - nome obrigatório
       if (!name.trim()) {
         setError('O nome é obrigatório.')
         setLoading(false)
@@ -34,9 +33,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { full_name: name.trim() },   // guarda o nome
-        },
+        options: { data: { full_name: name.trim() } },
       })
       if (error) {
         setError(error.message)
@@ -46,10 +43,9 @@ export default function LoginPage() {
       if (data.session) {
         router.push('/dashboard')
       } else {
-        setError('Verifique seu e-mail para confirmar a conta.')
+        setError('Conta criada! Verifique seu e-mail para confirmar.')
       }
     } else {
-      // LOGIN com senha
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
         setError(error.message)
@@ -67,8 +63,6 @@ export default function LoginPage() {
     try {
       const result = await loginWithBiometric()
       if (result.success) {
-        // Cria uma sessão no Supabase para o usuário encontrado
-        // (em produção, gere um token de acesso)
         router.push('/dashboard')
       } else {
         setError(result.error || 'Falha na biometria. Tente novamente.')
@@ -123,7 +117,7 @@ export default function LoginPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Seu nome completo"
-                required={isSignUp}
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B4D8]"
               />
             </div>
@@ -166,7 +160,6 @@ export default function LoginPage() {
             {loading ? 'Aguarde...' : isSignUp ? 'Criar conta' : 'Entrar'}
           </button>
 
-          {/* Botão Face ID / Biometria */}
           {!isSignUp && bioSupported && (
             <>
               <div className="flex items-center gap-3">
@@ -182,18 +175,14 @@ export default function LoginPage() {
               >
                 <span className="text-lg">👤</span> Entrar com Face ID
               </button>
+              <button
+                type="button"
+                onClick={handleEnableBiometric}
+                className="w-full text-[#00B4D8] text-sm font-semibold py-1"
+              >
+                🔐 Ativar Face ID neste dispositivo
+              </button>
             </>
-          )}
-
-          {/* Ativar Face ID (após login) */}
-          {!isSignUp && bioSupported && (
-            <button
-              type="button"
-              onClick={handleEnableBiometric}
-              className="w-full text-[#00B4D8] text-sm font-semibold py-1"
-            >
-              🔐 Ativar Face ID neste dispositivo
-            </button>
           )}
 
           <button

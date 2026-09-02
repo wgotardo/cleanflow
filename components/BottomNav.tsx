@@ -1,75 +1,33 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { useI18n } from '@/lib/i18n'
 
-function HomeIcon({ active }: { active: boolean }) {
+function Icon({ d, active }: { d: string; active: boolean }) {
   const c = active ? '#00B4D8' : '#9CA3AF'
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
+      <path d={d} />
     </svg>
   )
 }
 
-function CalendarIcon({ active }: { active: boolean }) {
-  const c = active ? '#00B4D8' : '#9CA3AF'
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  )
-}
-
-function FinanceIcon({ active }: { active: boolean }) {
-  const c = active ? '#00B4D8' : '#9CA3AF'
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="6" x2="12" y2="18" />
-      <path d="M16 8.5c0-1.5-1.8-2.5-4-2.5s-4 1-4 2.5 1.8 2.5 4 2.5 4 1 4 2.5-1.8 2.5-4 2.5-4-1-4-2.5" />
-    </svg>
-  )
-}
-
-function ClientsIcon({ active }: { active: boolean }) {
-  const c = active ? '#00B4D8' : '#9CA3AF'
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  )
-}
-
-function MoreIcon({ active }: { active: boolean }) {
-  const c = active ? '#00B4D8' : '#9CA3AF'
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="1" />
-      <circle cx="19" cy="12" r="1" />
-      <circle cx="5" cy="12" r="1" />
-    </svg>
-  )
+const icons: Record<string, string> = {
+  home: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+  schedule: 'M3 4h18v18H3z M16 2v4 M8 2v4 M3 10h18',
+  finance: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+  clients: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
+  more: 'M12 12h.01 M12 5h.01 M12 19h.01',
 }
 
 export default function BottomNav() {
   const router = useRouter()
   const pathname = usePathname()
-  const { t } = useI18n()
-
   const items = [
-    { label: 'home', path: '/dashboard', icon: (a: boolean) => <HomeIcon active={a} /> },
-    { label: 'schedule', path: '/agenda', icon: (a: boolean) => <CalendarIcon active={a} /> },
-    { label: 'finance', path: '/finance', icon: (a: boolean) => <FinanceIcon active={a} /> },
-    { label: 'clients', path: '/clients', icon: (a: boolean) => <ClientsIcon active={a} /> },
-    { label: 'more', path: '/more', icon: (a: boolean) => <MoreIcon active={a} /> },
+    { label: 'Home', path: '/dashboard', key: 'home' },
+    { label: 'Schedule', path: '/agenda', key: 'schedule' },
+    { label: 'Finance', path: '/finance', key: 'finance' },
+    { label: 'Clients', path: '/clients', key: 'clients' },
+    { label: 'More', path: '/more', key: 'more' },
   ]
 
   return (
@@ -80,13 +38,11 @@ export default function BottomNav() {
           <button
             key={item.path}
             onClick={() => router.push(item.path)}
-            className={`flex flex-col items-center text-[10px] font-semibold relative ${
-              active ? 'text-[#00B4D8]' : 'text-gray-400'
-            }`}
+            className={`flex flex-col items-center text-[10px] font-semibold relative ${active ? 'text-[#00B4D8]' : 'text-gray-400'}`}
           >
             {active && <span className="absolute -top-1 w-6 h-0.5 bg-[#00B4D8] rounded-full" />}
-            <span className="leading-none">{item.icon(active)}</span>
-            <span className="mt-1">{t(item.label)}</span>
+            <span className="leading-none"><Icon d={icons[item.key]} active={active} /></span>
+            <span className="mt-1">{item.label}</span>
           </button>
         )
       })}
