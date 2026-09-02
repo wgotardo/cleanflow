@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: 'Verificação falhou' }, { status: 400 })
   }
 
-  const { registrationInfo } = verification
+  // Na versão nova, os dados estão dentro de registrationInfo.credential
+  const credential = verification.registrationInfo.credential
 
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,9 +27,9 @@ export async function POST(req: Request) {
   const { error } = await supabaseAdmin.from('passkeys').insert({
     user_id: userId,
     email,
-    credential_id: Buffer.from(registrationInfo.credentialID).toString('base64'),
-    public_key: Buffer.from(registrationInfo.credentialPublicKey).toString('base64'),
-    counter: registrationInfo.counter,
+    credential_id: credential.id,   // ← era credentialID
+    public_key: Buffer.from(credential.publicKey).toString('base64'),  // ← era credentialPublicKey
+    counter: credential.counter,   // ← era counter
     device_name: 'Dispositivo do usuário',
   })
 

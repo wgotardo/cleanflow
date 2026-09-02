@@ -15,9 +15,10 @@ export async function POST() {
   }
 
   const options = await generateAuthenticationOptions({
+    rpID: process.env.WEBAUTHN_RP_ID || 'localhost',   // ← ADICIONADO
     timeout: 60000,
     allowCredentials: (passkeys || []).map((pk: any) => ({
-      id: pk.credential_id, // já é string base64url
+      id: pk.credential_id,
     })),
     userVerification: 'required',
   })
