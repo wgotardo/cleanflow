@@ -103,7 +103,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-[#00B4D8] flex items-center justify-center text-3xl mx-auto mb-3">💧</div>
           <h1 className="text-2xl font-bold text-white">CleanFlow</h1>
-          <p className="text-white/60 text-sm">Gestão de Limpeza</p>
+          <p className="text-white/60 text-sm">Cleaning Management</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 space-y-4">
