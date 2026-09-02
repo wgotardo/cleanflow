@@ -30,24 +30,31 @@ export default function FinancePage() {
         router.push('/')
         return
       }
-      await fetchTransactions()
+      const uid = data.session.user.id
+      await fetchTransactions(uid)
       setLoading(false)
     })
   }, [router])
 
-  async function fetchTransactions() {
-    const { data, error } = await supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(100)
+  async function fetchTransactions(uid: string) {
+    const { data, error } = await supabase
+      .from('transactions').select('*').eq('user_id', uid)
+      .order('created_at', { ascending: false }).limit(100)
     if (!error && data) setTransactions(data)
   }
 
   async function handleAddExpense(e: React.FormEvent) {
     e.preventDefault()
-    const { error } = await supabase.from('transactions').insert({ type: 'expense', category, amount: parseFloat(amount) || 0 })
+    const { data: { session } } = await supabase.auth.getSession()
+    const uid = session?.user.id
+    const { error } = await supabase.from('transactions').insert({
+      type: 'expense', category, amount: parseFloat(amount) || 0, user_id: uid,
+    })
     if (!error) {
       setShowForm(false)
       setCategory('supplies')
       setAmount('')
-      await fetchTransactions()
+      await fetchTransactions(uid!)
     }
   }
 

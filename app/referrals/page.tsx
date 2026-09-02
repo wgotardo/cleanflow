@@ -30,30 +30,34 @@ export default function ReferralsPage() {
         router.push('/')
         return
       }
-      await fetchReferrals()
+      const uid = data.session.user.id
+      await fetchReferrals(uid)
       setLoading(false)
     })
   }, [router])
 
-  async function fetchReferrals() {
-    const { data, error } = await supabase.from('referrals').select('*').order('created_at', { ascending: false }).limit(50)
+  async function fetchReferrals(uid: string) {
+    const { data, error } = await supabase.from('referrals').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(50)
     if (!error && data) setReferrals(data)
   }
 
   async function handleAddReferral(e: React.FormEvent) {
     e.preventDefault()
+    const { data: { session } } = await supabase.auth.getSession()
+    const uid = session?.user.id
     const { error } = await supabase.from('referrals').insert({
       referrer_name: referrerName,
       referred_name: referredName,
       status: 'new',
       reward_amount: parseFloat(rewardAmount) || 20,
+      user_id: uid,
     })
     if (!error) {
       setShowForm(false)
       setReferrerName('')
       setReferredName('')
       setRewardAmount('')
-      await fetchReferrals()
+      await fetchReferrals(uid!)
     }
   }
 

@@ -39,13 +39,17 @@ export default function DashboardPage() {
         return
       }
       setUser(data.session.user)
-      await Promise.all([fetchFinance(), fetchJobsToday(), fetchClients()])
+      const uid = data.session.user.id
+      await Promise.all([fetchFinance(uid), fetchJobsToday(uid), fetchClients(uid)])
       setLoading(false)
     })
   }, [router])
 
-  async function fetchFinance() {
-    const { data, error } = await supabase.from('transactions').select('type, amount, created_at')
+  async function fetchFinance(uid: string) {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('type, amount, created_at')
+      .eq('user_id', uid)
     if (!error && data) {
       const list = data as Transaction[]
       const rev = list.filter((x) => x.type === 'revenue').reduce((s, x) => s + x.amount, 0)
@@ -55,7 +59,7 @@ export default function DashboardPage() {
     }
   }
 
-  async function fetchJobsToday() {
+  async function fetchJobsToday(uid: string) {
     const start = new Date()
     start.setHours(0, 0, 0, 0)
     const end = new Date()
@@ -63,6 +67,7 @@ export default function DashboardPage() {
     const { data, error } = await supabase
       .from('jobs')
       .select('*')
+      .eq('user_id', uid)
       .gte('scheduled_at', start.toISOString())
       .lte('scheduled_at', end.toISOString())
       .order('scheduled_at', { ascending: true })
@@ -72,12 +77,21 @@ export default function DashboardPage() {
     }
   }
 
-  async function fetchClients() {
-    const { count, error } = await supabase.from('clients').select('id', { count: 'exact', head: true })
+  async function fetchClients(uid: string) {
+    const { count, error } = await supabase
+      .from('clients')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', uid)
     if (!error) setActiveClients(count || 0)
   }
 
   const profit = revenue - expenses
+
+  // Nome real do usuário (fallback para o e-mail)
+  const firstName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    (user?.email || 'User').split('@')[0]
 
   const serviceLabel: Record<string, string> = {
     standard: t('serviceStandard'),
@@ -107,8 +121,6 @@ export default function DashboardPage() {
       </div>
     )
   }
-
-  const firstName = (user?.email || 'User').split('@')[0]
 
   const kpis = [
     { label: t('revenue'), value: `$${revenue.toFixed(0)}`, icon: '💵', iconBg: 'bg-[#00B4D8]/15', delta: '+12%', valueColor: 'text-[#0A1F44]' },

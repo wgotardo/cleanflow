@@ -25,21 +25,22 @@ export default function KeysPage() {
         router.push('/')
         return
       }
-      await Promise.all([fetchProperties(), fetchAccesses(), fetchLogs()])
+      const uid = data.session.user.id
+      await Promise.all([fetchProperties(uid), fetchAccesses(uid), fetchLogs(uid)])
       setLoading(false)
     })
   }, [router])
 
-  async function fetchProperties() {
-    const { data, error } = await supabase.from('properties').select('*')
+  async function fetchProperties(uid: string) {
+    const { data, error } = await supabase.from('properties').select('*').eq('user_id', uid)
     if (!error && data) setProperties(data)
   }
-  async function fetchAccesses() {
-    const { data, error } = await supabase.from('accesses').select('*')
+  async function fetchAccesses(uid: string) {
+    const { data, error } = await supabase.from('accesses').select('*').eq('user_id', uid)
     if (!error && data) setAccesses(data)
   }
-  async function fetchLogs() {
-    const { data, error } = await supabase.from('access_logs').select('*').order('created_at', { ascending: false }).limit(10)
+  async function fetchLogs(uid: string) {
+    const { data, error } = await supabase.from('access_logs').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(10)
     if (!error && data) setLogs(data)
   }
 
