@@ -100,10 +100,19 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#0A1F44] flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        {/* LOGO PROFISSIONAL — identidade visual CleanFlow */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-[#00B4D8] flex items-center justify-center text-3xl mx-auto mb-3">💧</div>
-          <h1 className="text-2xl font-bold text-white">CleanFlow</h1>
-          <p className="text-white/60 text-sm">Cleaning Management</p>
+          <div className="relative w-20 h-20 mx-auto mb-4">
+            {/* Gota com gradiente navy→cyan + detalhe dourado */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#00B4D8] to-[#0A1F44] shadow-lg shadow-[#00B4D8]/30" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-3xl">💧</span>
+            </div>
+            {/* Detalhe dourado */}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-[#D4AF37]" />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">CleanFlow</h1>
+          <p className="text-white/60 text-sm tracking-[0.18em] uppercase mt-1">Cleaning Management</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 space-y-4">
